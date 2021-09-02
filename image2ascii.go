@@ -4,10 +4,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/qeesung/image2ascii/convert"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+
+	"github.com/qeesung/image2ascii/convert"
 )
 
 var imageFilename string
@@ -25,7 +26,8 @@ func init() {
 	flag.StringVar(&imageFilename,
 		"f",
 		"",
-		"Image filename to be convert")
+		"Image filename or url to be convert")
+
 	flag.Float64Var(&ratio,
 		"r",
 		convertDefaultOptions.Ratio,
@@ -89,7 +91,8 @@ func usage() {
 >> HomePage: https://github.com/qeesung/image2ascii
 >> Issue   : https://github.com/qeesung/image2ascii/issues
 >> Author  : qeesung
-Usage: image2ascii [-s] -f <filename> -r <ratio> -w <width> -g <height>
+Usage: image2ascii [-s] -f <filename|url> -r <ratio> -w <width> -g <height>
+Hello from open-summit
 
 Options:
 `)

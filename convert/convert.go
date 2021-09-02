@@ -3,9 +3,14 @@ package convert
 
 import (
 	"bytes"
-	"github.com/qeesung/image2ascii/ascii"
 	"image"
 	"image/color"
+	"io"
+	"net/http"
+	"strings"
+
+	"github.com/qeesung/image2ascii/ascii"
+
 	// Support decode jpeg image
 	_ "image/jpeg"
 	// Support deocde the png image
@@ -145,18 +150,36 @@ func (converter *ImageConverter) ImageFile2ASCIIString(imageFilename string, opt
 	return converter.Image2ASCIIString(img, option)
 }
 
+func DownloadImage(url string) (io.ReadCloser, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body, nil
+}
+
 // OpenImageFile open a image and return a image object
 func OpenImageFile(imageFilename string) (image.Image, error) {
-	f, err := os.Open(imageFilename)
+	var reader io.ReadCloser
+	var err error
+	if strings.HasPrefix(imageFilename, "https://") ||
+		strings.HasPrefix(imageFilename, "http://") {
+		reader, err = DownloadImage(imageFilename)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		reader, err = os.Open(imageFilename)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	img, _, err := image.Decode(reader)
 	if err != nil {
 		return nil, err
 	}
 
-	img, _, err := image.Decode(f)
-	if err != nil {
-		return nil, err
-	}
-
-	defer f.Close()
+	defer reader.Close()
 	return img, nil
 }
